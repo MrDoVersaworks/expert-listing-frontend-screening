@@ -1,0 +1,7 @@
+# Screening Task Write-up
+
+I kept the implementation deliberately small: a React component owns interaction state, while API access is isolated in a tiny module. I used a 300ms debounce to avoid a request for every keystroke, and AbortController to cancel superseded requests. Cancellation alone is not treated as a correctness guarantee, so each request also receives a monotonically increasing sequence number. A response is applied only if its sequence is still current. This protects the UI from out-of-order responses even when a request has already completed or cannot be cancelled in time.
+
+For scale, I would move the external API call behind a server or edge layer so caching, rate limiting, observability, authentication policy, and provider changes are controlled centrally. Common queries could be cached, result fields and counts kept intentionally small, and a dedicated search service introduced only when traffic or relevance requirements justify it. I would also add request metrics, tracing, and a graceful provider fallback if the product needed stronger availability.
+
+I would test the debounce boundary, empty and error states, keyboard navigation and selection, Escape/clear behavior, cancellation, stale-response protection, accessibility semantics, and rendering under slow networks. I would also add integration tests against a mocked API and a browser-level accessibility check before release.
